@@ -1,0 +1,4 @@
+---
+linux_timezone: Etc/UTC
+linux_locale: en_US.UTF-8
+linux_language: 'en_US:en'

@@ -1,0 +1,42 @@
+---
+
+- name: Ensure minimal requirements for Ansible are present
+  apt: pkg={{ item }} state=present update_cache=true cache_valid_time=3600
+  with_items:
+     - python
+     - python-apt
+     - python-pycurl
+     - aptitude
+
+- name: Ensure hostname is set to {{ inventory_hostname }}
+  hostname: "name={{ inventory_hostname }}"
+
+- name: Ensure timezone is {{ linux_timezone }}
+  file: content="{{ linux_timezone}}" dest=/etc/timezone
+  notify: reconfigure tzdata
+
+- name: Ensure localtime is {{ linux_timezone }}
+  file: src=/usr/share/zoneinfo/{{ linux_timezone }} dest=/etc/localtime
+  notify: reconfigure tzdata
+
+- name: Ensure /etc/environment exists (makes PATH sane)
+  template: src=etc/environment dest=/etc/environment
+
+- name: Ensure system is up-to-date
+  apt: upgrade=dist update_cache=true cache_valid_time=3600
+
+- name: Check if a reboot is required
+  register: reboot_file
+  stat: path=/var/run/reboot-required get_md5=no
+
+- name: Reboot system
+  command: /sbin/reboot
+  when: reboot_file.stat.exists == true
+
+- name: Wait for the server to go down (reboot)
+  local_action: wait_for host={{ inventory_hostname }} port=22 state=stopped
+  when: reboot_file.stat.exists == true
+
+- name: Wait for the server to come up
+  local_action: wait_for host={{ inventory_hostname }} port=22 delay=30
+  when: reboot_file.stat.exists == true
