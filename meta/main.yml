@@ -1,1 +1,5 @@
 ---
+galaxy_info:
+  author: Tim Lieberman <tim@timdev.com>
+  description: Ansible role to do minimal configuration of a debian (7.x) box and get it patched up.
+  min_ansible_version: 1.9
