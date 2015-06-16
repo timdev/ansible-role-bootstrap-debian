@@ -4,4 +4,4 @@ galaxy_info:
   description: Ansible role to do minimal configuration of a debian (7.x) box and get it patched up.
   license: MIT
   min_ansible_version: 1.9
-  dependencies: []
+dependencies: []
